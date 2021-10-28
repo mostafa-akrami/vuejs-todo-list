@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>TO DO LIST</title>
+</head>
+<body>
+    <section id="app">
+        <section class="header">
+            <h1>TO DO LIST</h1>
+            <input type="text" placeholder="to do" v-model.trim="input" @keydown.enter="addToDo">
+            <button class="addBtn" @click="addToDo">Add to list</button>
+        </section>
+        <ul>
+            <todo-item v-for="(todo , index) in todos" :key="todo.text" :todo="todo"
+                @checked="todo.completed = !todo.completed" @todo-deleted="deleteToDo(index)"></todo-item>
+        </ul>
+    </section>
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    input: null,
+                    todos: [
+                        // {text: 'first to do' , completed: false},
+                        // {text: 'second to do' , completed: false}
+                    ]
+                }
+            },
+            methods: {
+                addToDo() {
+                    if(this.input) {
+                        this.todos.push({text: this.input , completed: false});
+                        this.input = "";
+                    }
+                },
+                deleteToDo(index) {
+                    this.todos.splice(index , 1)
+                }
+            }
+        });
+
+        app.component("TodoItem" , {
+            template: `
+                <li @click="$emit('checked')"
+                    :class="{'checked' : todo.completed}">
+                    {{ todo.text }}
+                    <button class="close" @click="$emit('todo-deleted')">X</button>
+                </li>
+            `,
+            props: ['todo'],
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
