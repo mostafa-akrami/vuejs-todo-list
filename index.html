@@ -14,6 +14,13 @@
             <input type="text" placeholder="to do" v-model.trim="input" @keydown.enter="addToDo">
             <button class="addBtn" @click="addToDo">Add to list</button>
             <section style="margin-top: 100px;"></section>
+            <section class="selectBox">
+                <select @change="onChange($event)">
+                    <option value="top">Add to top of list</option>
+                    <option value="bottom">Add to bottom of list</option>
+                </select>
+            </section>
+            <section style="margin-top: 20px;"></section>
             <a href="https://github.com/mostafa-akrami/vuejs-todo-list" target="_blank"
                 style="color: #000; text-decoration: none;">
                 لینک گیت هاب
@@ -38,14 +45,24 @@
                     todos: [
                         // {text: 'first to do' , completed: false},
                         // {text: 'second to do' , completed: false}
-                    ]
+                    ],
+                    select: 'top'
                 }
             },
             methods: {
+                onChange(event) {
+                    this.select = event.target.value
+                },
                 addToDo() {
                     if(this.input) {
-                        this.todos.push({text: this.input , completed: false});
-                        this.input = "";
+                        if(this.select === 'top') {
+                            this.todos.unshift({text: this.input , completed: false});
+                            this.input = "";
+                        }
+                        else if(this.select === 'bottom') {
+                            this.todos.push({text: this.input , completed: false});
+                            this.input = "";
+                        }
                     }
                 },
                 deleteToDo(index) {
@@ -56,8 +73,7 @@
 
         app.component("TodoItem" , {
             template: `
-                <li @click="$emit('checked')"
-                    :class="{'checked' : todo.completed}">
+                <li @click="$emit('checked')" :class="{'checked' : todo.completed}">
                     {{ todo.text }}
                     <button class="close" @click="$emit('todo-deleted')">X</button>
                 </li>
